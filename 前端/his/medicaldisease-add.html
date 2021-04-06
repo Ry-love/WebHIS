@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5shiv.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
+<!--[if IE 6]>
+<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<title>退号</title>
+</head>
+<body>
+<div class="page-container" id="wyb">
+	<div class="row cl">
+		<label class="form-label col-xs-2  col-sm-2">添加西医诊断</label>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-2 col-sm-2" style="margin-top: 5px;"><span class="c-red">*</span>疾病名称：</label>
+		<input type="text" name="" id="" v-model="checkName" placeholder="请输入查询疾病名称"  style="width:500px" class="input-text">
+		<button name="" id="" class="btn btn-success" type="button" @click="check"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+	</div>
+	<div class="mt-20">
+		<div class="row cl" style="margin-top: 20px;">
+			<label class="form-label col-xs-1 col-sm-1">诊断信息</label>
+		</div>
+		<table class="table table-border table-bordered table-bg table-hover  table-responsive">
+			<thead>
+				<tr class="text-c">
+					<th width="90">ICD编码</th>
+					<th width="180">疾病名称</th>
+					<th >疾病类型</th>
+					<th width="120">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="text-c" v-for="item in diseaseList">
+					<td v-text="item.diseaseICD"></td>
+					<td v-text="item.diseaseName"></td>
+					<td v-text="item.diseCategoryID.dicaName"></td>			
+					<td><button name="" id="" @click="choose(item)" class="btn btn-success" onClick="article_edit('添加疾病详情','medicaldiseasedetail-add.html')" type="button">选择</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+		<!-- 分页组件-->
+		<div style="margin-top: 10px;">
+		<p style="float: left;">总共 {{totals}} 条数据,共 {{totalPage}} 页</p>
+		<div style="float: right;">
+			<button class="btn" v-if="page>1" @click="checkDisease(page-1)">上一页</button>
+			{{page}}
+			<button class="btn" v-if="page!=totalPage" @click="checkDisease(page+1)">下一页</button>
+		</div>
+		</div>
+</div>
+
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="static/h-ui/js/H-ui.min.js"></script> 
+<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.js"></script> <!--/_footer 作为公共模版分离出去-->
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="lib/My97DatePicker/4.8/WdatePicker.js"></script> 
+<script type="text/javascript" src="lib/datatables/1.10.0/jquery.dataTables.min.js"></script> 
+<script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript">
+function article_edit(title,url){
+		layer.open({
+			type: 2,
+			title: title,
+			content: url,
+		    area: ['700px', '400px'],  //弹出层页面比例
+		});
+}
+</script> 
+<script>
+	var app =new Vue({
+			el:"#wyb",
+			data:{
+				checkName:"",
+				page:1,
+				rows:5,
+				totalPage:0,
+				totals:0,
+				disease:{},//选定的疾病对象
+				diseaseList:[]			
+			},
+			methods:{
+				checkDisease(checkPage){
+					//axois调用预留
+					var _this =this;
+					axios.get("http://localhost:8080/visit/findAllDisease?page="+checkPage+"&rows="+this.rows).then(res=>{
+							_this.diseaseList = res.data.diseases;
+							_this.page=res.data.page;
+							_this.totalPage=res.data.totalPage;
+							_this.totals=res.data.totals;
+					})
+				},
+				check(){
+					if(this.checkName==""){
+						this.checkDisease(1);
+					}else{
+						var _this =this;
+						axios.post("http://localhost:8080/visit/checkDisease?checkName="+this.checkName).then(res=>{
+							_this.diseaseList=res.data.diseases;
+						});	
+					}
+				},
+				choose(item){
+					this.disease=item;
+					//将选定的挂号信息存储在localStorage中
+					localStorage.setItem("disease",JSON.stringify(this.disease));
+				}
+				
+			},
+			created(){
+				//填充列表
+				this.checkDisease(1);
+			}
+		})	
+</script>
+</body>
+</html>

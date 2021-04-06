@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5shiv.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
+<!--[if IE 6]>
+<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<title>发票信息</title>
+</head>
+<body>
+<div class="page-container" id="wrap">
+	<form  class="form form-horizontal" id="form-member-add">
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2 "><span class="c-red"></span>发票号：</label>
+			<div class="formControls col-xs-3 col-sm-3">
+				<input type="text" class="input-text" v-model="invoiceNum" value="" placeholder=""  id="username" name="username">
+			</div>
+			<label class="form-label col-xs-2  col-sm-2 "><span class="c-red"></span>病历号：</label>
+			<div class="formControls col-xs-3 col-sm-3">
+				<input type="text" class="input-text" v-model="register.caseNumber" value="" placeholder=""  id="username" name="username">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2  col-sm-2 "><span class="c-red"></span>患者姓名：</label>
+			<div class="formControls col-xs-3 col-sm-3">
+				<input type="text" class="input-text" v-model="register.realName" value="" placeholder=""  id="username" name="username">
+			</div>
+			<label class="form-label col-xs-2  col-sm-2 "><span class="c-red">*</span>支付方式：</label>
+			<div class="formControls col-xs-3 col-sm-3" >
+				<span class="select-box"><select class="select" v-model="selectType.id">
+					<option value="51" v-for="item in freeType" :value="item.id" v-text="item.constantName"></option>
+				</select></span>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2  col-sm-2 "><span class="c-red"></span>应收金额：</label>
+			<div class="formControls col-xs-3 col-sm-3">
+				<input type="text" class="input-text" value="" v-model="totalAmount" placeholder=""  id="username" name="username">
+			</div>
+			<label class="form-label col-xs-2  col-sm-2 "><span class="c-red"></span>实收金额：</label>
+			<div class="formControls col-xs-3 col-sm-3">
+				<input type="text" class="input-text" value="" @change="charge" v-model="actuAmount" placeholder=""  id="username" name="username">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2  col-sm-2 "><span class="c-red"></span>找零：</label>
+			<div class="formControls col-xs-3 col-sm-3">
+				<input type="text" class="input-text" value="" v-model="chargeAmount" placeholder=""  id="username" name="username">
+			</div>
+		</div>
+		<div class="row cl" >
+			<div class="formControls col-xs-2  col-sm-2 " >
+			<button name="" id="" class="btn btn-danger" @click="chargeAll"  type="button" style=" width: 100px; margin-left: 325px;">收费</button>
+			</div>	
+		</div>
+	</form>
+</div>
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="static/h-ui/js/H-ui.min.js"></script> 
+<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.js"></script> <!--/_footer 作为公共模版分离出去-->
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="lib/My97DatePicker/4.8/WdatePicker.js"></script> 
+<script type="text/javascript" src="lib/datatables/1.10.0/jquery.dataTables.min.js"></script> 
+<script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+	var app =new Vue({
+			el:"#wrap",
+			data:{
+				userID:{id:10},
+				totalAmount:0,
+				actuAmount:0,
+				chargeAmount:0,
+				register:{},
+				invoiceNum:0,
+				freeType:[] ,//支付方式数组
+				selectType:{id:51},
+				selectprescriptiondList:[],
+				invoice:{},
+				costsList:[]
+			},
+			methods:{
+				initMethod(){
+					//获取最大发票号
+					//初始化支付方式数组
+					var _this = this;
+					axios.post("http://localhost:8080/toll/init").then(res=>{
+						_this.invoiceNum=res.data.invoiceNum;
+						_this.freeType=res.data.freeType;
+					});
+					//计算总金额
+					for(var i=0;i<this.selectprescriptiondList.length;i++){
+						this.totalAmount +=this.selectprescriptiondList[i].drugsID.drugsPrice.toFixed(12)*this.selectprescriptiondList[i].amount;
+					}
+					
+				},
+				charge(){
+					this.chargeAmount = (this.actuAmount-this.totalAmount).toFixed(2);
+				},
+				chargeAll(){
+					if(window.confirm("确定要进行收费吗？")){
+						//保存到Invoice
+						this.invoice.invoiceNum=this.invoiceNum;
+						this.invoice.money=this.totalAmount;
+						this.invoice.state=1;
+						this.invoice.userID=this.userID;
+						this.invoice.registID=this.register;
+						this.invoice.feeType=this.selectType;
+						this.invoice.dailyState=0;
+						var _this=this;
+						axios.post("http://localhost:8080/toll/save1",this.invoice).then(res=>{
+								_this.savecostList(res.data);
+						});	
+					}
+				},
+				savecostList(temp){
+					this.costsList=[];
+					// //把发票具体信息存储
+					for(var i=0;i<this.selectprescriptiondList.length;i++){
+						var patientcosts ={
+							invoiceID:{id:0},
+							itemID:{id:0}};
+						patientcosts.registID=this.register;
+						patientcosts.invoiceID.id=temp;
+						patientcosts.itemID.id=13;
+						patientcosts.itemType=2;
+						patientcosts.name=this.selectprescriptiondList[i].drugsID.drugsName;
+						patientcosts.price=this.selectprescriptiondList[i].drugsID.drugsPrice;
+						patientcosts.amount=this.selectprescriptiondList[i].amount;
+						patientcosts.deptID=this.register.deptID;
+						patientcosts.createtime=this.selectprescriptiondList[i].prescriptionID.prescriptionTime;
+						patientcosts.createOperID=this.register.userID;
+						patientcosts.registerID=this.userID;
+						patientcosts.feeType=this.selectType;
+						this.costsList.push(patientcosts);
+					}	
+					axios.post("http://localhost:8080/toll/save2",this.costsList).then(res=>{
+						alert(res.data.msg);
+					});	
+					this.chageState();
+				},
+				chageState(){
+					//更改患者处方详细列表状态
+					for(var i=0;i<this.selectprescriptiondList.length;i++){
+							this.selectprescriptiondList[i].state=3;	
+					}
+					axios.post("http://localhost:8080/toll/save3",this.selectprescriptiondList).then(res=>{
+					});	
+					
+				}
+			},
+			created() {
+				var loginID = localStorage.getItem("loginID");
+				if(loginID){
+						  this.userID =JSON.parse(loginID);
+				}else{
+						 alert("您尚未登录，点击确定跳转到登录页面");
+						 location.href="login.html";
+				}
+				var selectprescriptiondList = localStorage.getItem("selectprescriptiondList");
+				if(selectprescriptiondList){
+					this.selectprescriptiondList =JSON.parse(selectprescriptiondList);
+				};
+				var register = localStorage.getItem("registerToll");
+				if(register){
+					this.register =JSON.parse(register);
+				};
+				this.initMethod();	
+				console.log(this.register);
+			}
+			})	
+</script>
+</body>
+</html>

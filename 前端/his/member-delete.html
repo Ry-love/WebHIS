@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5shiv.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
+<!--[if IE 6]>
+<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<title>退号</title>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 挂号收费 <span class="c-gray en">&gt;</span> 退号 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container" id="wrap">
+	<div class="row cl">
+		<label class="form-label col-xs-1 col-sm-1">患者信息查询</label>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-1 col-sm-1" style="margin-top: 5px;"><span class="c-red">*</span>病历号：</label>
+		<input type="text" name="" id="" placeholder="请输入查询病历号" v-model="caseNumber" style="width:250px" class="input-text">
+		<button name="" id="" class="btn btn-success" type="button" @click="checkNumber(page)"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-1 col-sm-1">患者信息确认</label>
+		<label class="form-label col-xs-11 col-sm-11"></label>
+	</div>
+	<div class="row cl">
+		<label class="form-label col-xs-1 col-sm-1" style="margin-top: 5px;"><span class="c-red">*</span>姓名：</label>
+		<div class="formControls col-xs-1 col-sm-1" style="margin-left: -15px;">
+			<input type="text" class="input-text" value="" v-model="register.realName" placeholder="姓名"  name="username">
+		</div>
+		<label class="form-label col-xs-2 col-sm-2" style="margin-top: 5px;"><span class="c-red">*</span>身份证号：</label>
+		<div class="formControls col-xs-2 col-sm-2" style="margin-left: -100px;" >
+			<input type="text" class="input-text" value="" v-model="register.idNumber" placeholder="身份证号"  name="username">
+		</div>
+		<label class="form-label col-xs-1 col-sm-1"  style="margin-top: 5px;"><span class="c-red"></span>家庭住址：</label>
+		<div class="formControls col-xs-3 col-sm-3" >
+			<input type="text" class="input-text" value="" v-model="register.homeAddress" placeholder="家庭住址" name="username">
+		</div>
+	</div>
+	<div class="mt-20">
+		<div class="row cl" style="margin-top: 20px;">
+			<label class="form-label col-xs-1 col-sm-1">患者挂号信息</label>
+		</div>
+		<div style="height: 200px; border: 1px solid whitesmoke;">
+		<table class="table table-border table-bordered table-bg table-hover  table-responsive">
+			<thead>
+				<tr class="text-c">
+					<th width="80">病历号</th>
+					<th width="80">姓名</th>
+					<th >身份证号</th>
+					<th width="120">挂号日期</th>
+					<th width="80">挂号午别</th>
+					<th width="75">看诊科室</th>
+					<th width="60">看诊状态</th>
+					<th width="120">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="text-c" v-for="item in registerList">
+					<td v-text="item.caseNumber"></td>
+					<td v-text="item.realName"></td>
+					<td v-text="item.idNumber"></td>
+					<td v-text="item.registTime"></td>
+					<td v-text="item.noon"></td>
+					<td v-text="item.deptID.deptName"></td>
+					<td v-if="item.visitState==1">已挂号</td>
+					<td v-if="item.visitState==2">医生接诊</td>
+					<td v-if="item.visitState==3">看诊结束</td>
+					<td v-if="item.visitState==4">已退号</td>
+					<td><button @click="backSign(item)" class="btn btn-success" type="button">退号</button></span></td>
+				</tr>
+				
+			</tbody>
+		</table>
+		</div>
+	</div>
+		
+		<!-- 分页组件-->
+		<div style="margin-top: 10px;">
+		<p style="float: left;">总共 {{totals}} 条数据,共 {{totalPage}} 页</p>
+		<div style="float: right;">
+			<button class="btn" v-if="page>1" @click="checkNumber(page-1)">上一页</button>
+			{{page}}
+			<button class="btn" v-if="page!=totalPage" @click="checkNumber(page+1)">下一页</button>
+		</div>
+		</div>
+</div>
+
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="static/h-ui/js/H-ui.min.js"></script> 
+<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.js"></script> <!--/_footer 作为公共模版分离出去-->
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="lib/My97DatePicker/4.8/WdatePicker.js"></script> 
+<script type="text/javascript" src="lib/datatables/1.10.0/jquery.dataTables.min.js"></script> 
+<script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+	var app =new Vue({
+			el:"#wrap",
+			data:{
+				caseNumber:null,
+				page:1,
+				rows:3,
+				totalPage:0,
+				totals:0,
+				register:{}	,//		选定的挂号对象，相关属性赋值操作预留
+				registerList:[], //查询的挂号列表
+			},
+			methods:{
+				//根据病历号搜索挂号信息,赋值挂号对象给register
+				checkNumber(checkPage){
+					//axois调用预留
+					var _this =this;
+					axios.get("http://localhost:8080/backSign/findByPage?page="+checkPage+"&rows="+this.rows+"&caseNumber="+this.caseNumber).then(res=>{
+							_this.registerList = res.data.registers;
+							_this.page=res.data.page;
+							_this.totalPage=res.data.totalPage;
+							_this.totals=res.data.totals;
+							_this.register=_this.registerList[0];
+					});
+				
+				},
+				//处理退号业务
+				backSign(item)//传入参数id 
+				{
+					if(item.visitState!=1){
+						alert("当前挂号状态无法退号");	
+					}else{
+						if(window.confirm("确定要进行退号吗？")){
+							this.register=item;
+							//axois调用预留
+							this.register.visitState=4;
+							axios.post("http://localhost:8080/backSign/save",this.register).then(res=>{
+								alert(res.data.msg);
+							});
+							//重新刷新页面
+							this.checkNumber(1);
+						}	
+					}				
+				},
+				
+			},
+		
+			})	
+</script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="Bookmark" href="/favicon.ico" >
+<link rel="Shortcut Icon" href="/favicon.ico" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5shiv.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
+<!--[if IE 6]>
+<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<!--/meta 作为公共模版分离出去-->
+
+<title>现场挂号</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+</head>
+<body>
+<div id="wrap">
+
+<article class="page-container">
+	<form  class="form form-horizontal" id="form-member-add">
+		<div class="row cl">
+			<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>发票号：</label>
+			<div class="formControls col-xs-2 col-sm-2">
+				<input type="text" class="input-text" value="" placeholder="" v-model="invoice" id="username" name="username">
+			</div>
+			<div class="formControls col-xs-1 col-sm-1" >
+				<input class="btn btn-primary radius" type="button" @click="regist" value="挂号">
+			</div>
+			<div class="formControls col-xs-1 col-sm-1" >
+				<input class="btn btn-primary radius"  type="reset" value="清空">
+			</div>			
+			<label class="form-label col-xs-5 col-sm-5"></label>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-1 col-sm-1">挂号信息</label>
+			<label class="form-label col-xs-11 col-sm-11"></label>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>病历号：</label>
+			<div class="formControls col-xs-2 col-sm-2">
+				<input type="text" class="input-text" value="" @change="checkNumber" v-model="register.caseNumber" placeholder="" id="username" name="username">
+			</div>
+			<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>姓名：</label>
+			<div class="formControls col-xs-2 col-sm-2">
+				<input type="text" class="input-text" value="" v-model="register.realName" placeholder="在此输入姓名" id="username" name="username">
+			</div>
+			<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>性别：</label>
+			<div class="formControls col-xs-1 col-sm-1" >
+				<span class="select-box"><select class="select" v-model="register.gender.id">
+					<option value="71">男</option>
+					<option  value="72">女</option>
+				</select></span>
+			</div>
+			<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>年龄：</label>
+			<div class="formControls col-xs-1 col-sm-1">
+				<input type="text" class="input-text" v-model="register.age" value="" placeholder="" id="username" name="username">
+			</div>
+			<div class="formControls col-xs-1 col-sm-1">
+				<span class="select-box"><select class="select" v-model="register.ageType">
+					<option value="岁">岁</option>
+					<option value="月">月</option>
+					<option value="日">日</option>
+				</select></span>
+			</div>
+		</div>		
+		<div class="row cl">
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: 5px;"><span class="c-red">*</span>出生日期:</label>
+			<div class="formControls col-xs-2 col-sm-2">
+				<input type="date" id="logmin" class="input-text Wdate" v-model="register.birthDate" style="width:180px; margin-left: -5px;">
+			</div>
+			<label class="form-label col-xs-1 col-sm-1"><span class="c-red">*</span>身份证号：</label>
+			<div class="formControls col-xs-2 col-sm-2" style="margin-left: -5px;">
+				<input type="text" class="input-text" value="" v-model="register.idNumber" placeholder="在此输入身份证号" id="username" name="username">
+			</div>
+			<label class="form-label col-xs-1 col-sm-1"><span class="c-red"></span>家庭住址：</label>
+			<div class="formControls col-xs-3 col-sm-3" >
+				<input type="text" class="input-text" value="" v-model="register.homeAddress" placeholder="在此输入家庭住址" id="username" name="username">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: 5px;"><span class="c-red">*</span>结算类别:</label>
+			<div class="formControls col-xs-1 col-sm-1" style="margin-left: -5px;">
+				<span class="select-box"><select class="select" v-model="register.settleID.id">
+					<option v-for="item in settleList" :value="item.id">{{item.settleName}}</option>
+				</select></span>
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: 5px;"><span class="c-red">*</span>看诊日期:</label>
+			<div class="formControls col-xs-2 col-sm-2">
+				<input type="date" id="logmin" class="input-text Wdate" v-model="register.visitDate" style="width:160px; margin-left: -5px;">
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: -125px;"><span class="c-red">*</span>午别:</label>
+			<div class="formControls col-xs-1 col-sm-1" style="margin-left: -5px;">
+				<span class="select-box"><select class="select" v-model="register.noon">
+					<option value="上午">上午</option>
+					<option value="下午">下午</option>
+				</select></span>
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: -28px;"><span class="c-red">*</span>科室分类:</label>
+			<div class="formControls col-xs-1 col-sm-1" style="margin-left: 10px;">
+				<span class="select-box">
+				<select class="select"  v-model="depType" @change="changeDep">
+					<option v-for="item in depTypeList" :value="item.id">{{item.constantName}}</option>
+				</select>
+				</span>
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: -16px;"><span class="c-red">*</span>挂号科室:</label>
+			<div class="formControls col-xs-1 col-sm-1" style="margin-left: 5px;">
+				<span class="select-box">
+				<select class="select"  v-model="register.deptID.id">
+					<option v-for="item in depList" :value="item.id">{{item.deptName}}</option>
+				</select>
+				</span>
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: -40px;"><span class="c-red">*</span>号别:</label>
+			<div class="formControls col-xs-1 col-sm-1" style="margin-left: 10px;">
+				<span class="select-box"><select class="select" v-model="register.registLeID" @change="changeDoc">
+					<option v-for="item in levList" :value="item">{{item.registName}}</option>
+				</select></span>
+			</div>
+		</div>
+		<div class="row cl">
+			
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: 5px;"><span class="c-red">*</span>看诊医生:</label>
+			<div class="formControls col-xs-1 col-sm-1" style="margin-left: -5px;">
+				<span class="select-box"><select class="select" v-model="register.userID" @change="changeQuota">
+					<option v-for="item in docList" :value="item">{{item.realName}}</option>
+				</select></span>
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: 10px;"><span class="c-red"></span>初始号额：</label>
+			<div class="formControls col-xs-1 col-sm-1" style="margin-left: -10px;">
+				<input type="text" class="input-text" :value="register.registLeID.registQuota" placeholder="" id="username" name="username">
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: 30px;"><span class="c-red"></span>已用号额：</label>
+			<div class="formControls col-xs-1 col-sm-1"  style="margin-left: -13px;">
+				<input type="text" class="input-text" v-model="quota" placeholder="" id="username" name="username">
+			</div>
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: -18px;"><span class="c-red"></span>病历本：</label>
+			<div class="formControls col-xs-1 col-sm-1"  style="margin-top: 4px;">
+				<input type="checkbox" v-model="register.isBook"  placeholder="" id="username" name="username">
+			</div>
+	
+			<label class="form-label col-xs-1 col-sm-1" style="margin-left: -5px;"><span class="c-red">*</span>应收金额：</label>元
+			<div class="formControls col-xs-1 col-sm-1"  style="margin-left: -5px;">
+				<input type="text" class="input-text" :value="register.registLeID.registFee" placeholder="" id="username" name="username">
+			</div>
+			</div>
+		</div>
+	</form>
+</article>	
+</div>
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="static/h-ui/js/H-ui.min.js"></script> 
+<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.js"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本--> 
+<script type="text/javascript" src="lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="lib/jquery.validation/1.14.0/jquery.validate.js"></script> 
+<script type="text/javascript" src="lib/jquery.validation/1.14.0/validate-met hods.js"></script> 
+<script type="text/javascript" src="lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>
+		var app =new Vue({ 
+			el:"#wrap",
+			data:{
+				register:{
+					caseNumber:0,
+					gender:{id:71},
+					ageType:"岁",
+					noon:"上午",
+					deptID:{},
+					userID:{},
+					registLeID:{},//记得后端补充默认选项
+					settleID:{id:1},
+					isBook:0,
+					registerID:{id:10},
+					//无挂号员id和挂号时间（精确到秒），需要后台填充
+					visitState:1
+				},
+				invoice:123456789,
+				quota:0,
+				depType:11,
+				depTypeList:[],//科室分类
+				depList:[] ,//科室对象数组
+				settleList:[],//这里其实是个settle对象数组
+				levList:[],//这里是个lev对象数组
+				docList:[],//这里是医生对象数组
+				levList:[]//这里是挂号级别数组
+			},
+			methods:{
+				//处理挂号业务
+				regist(){
+					//表单检验
+					console.log(this.register);
+					if(this.invoice && this.register.caseNumber && this.register.realName 
+					&& this.register.age && this.register.birthDate && this.register.idNumber
+					&& this.register.visitDate){
+						//axois调用预留
+						//存储数据
+						axios.post("http://localhost:8080/register/save?invoice="+this.invoice,this.register).then(res=>{
+							if(res.data.status){
+								alert(res.data.msg);
+							}else{
+								alert(res.data.msg);
+							}
+						})
+					}else{
+						alert("必填信息不能为空！");
+						return;
+					}
+				},
+				//检测病历号是否是二次挂号
+				checkNumber(){
+					console.log(this.register.caseNumber);
+					//axois调用预留
+					var _this =this;
+					axios.get("http://localhost:8080/register/checkNum?caseNumber="+this.register.caseNumber).then(res=>{
+						if(res.data!=null){
+							console.log(res.data);
+							_this.register=res.data;
+						}
+					})
+				},
+				//处理科室分类变动更新业务
+				changeDep(){
+					var _this =this;
+					axios.get("http://localhost:8080/register/changeDepType?id="+_this.depType).then(res=>{
+						_this.depList=res.data;
+					})
+				},
+				//处理医生列表表变动业务
+				changeDoc(){
+					var _this =this;
+					axios.get("http://localhost:8080/register/changeDoc?levID="+_this.register.registLeID.id+"&deptID="+_this.register.deptID.id).then(res=>{
+						_this.docList=res.data;
+					});
+				},
+				//处理医生可用号额查询业务
+				changeQuota(){
+					var _this =this;
+					axios.get("http://localhost:8080/register/quota?state=1&id="+_this.register.userID.id).then(res=>{
+						_this.quota=res.data;
+					});
+				}
+			},
+			created(){
+				//声明周期函数
+				 var loginID = localStorage.getItem("loginID");
+				 if(loginID){
+					  this.registerID =JSON.parse(loginID);
+				 }else{
+					 alert("您尚未登录，点击确定跳转到登录页面");
+					 location.href="login.html";
+				 }
+				//获取发票号和可用病历号和数组对象相关信息
+				//axois调用预留
+				var _this =this;
+				axios.post("http://localhost:8080/register/init").then(res=>{
+					_this.invoice=res.data.invoiceNum;
+					_this.register.caseNumber=res.data.caseNumber;
+					_this.depTypeList=res.data.depTypeList;
+					_this.levList=res.data.registlevelList;
+					_this.settleList=res.data.settlecategoryList;
+				});
+				_this.changeDep();
+				//用户登录
+			}
+			})
+	</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

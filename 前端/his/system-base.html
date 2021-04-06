@@ -1,0 +1,598 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="Bookmark" href="/favicon.ico" >
+<link rel="Shortcut Icon" href="/favicon.ico" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5shiv.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
+<!--[if IE 6]>
+<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<!--/meta 作为公共模版分离出去-->
+
+<title>医生</title>
+</head>
+<body>
+<div class="page-container" id="wrap">
+	<div>
+	<p>患者姓名：<span v-text="register.realName" style="margin-right: 5px;"></span>病历号：<span v-text="register.caseNumber"></span> 年龄：<span v-text="register.age"></span> 性别：<span v-text="register.gender.constantName"></span></p>
+	<button style="float: right;" name="" id="" class="btn btn-danger" type="button"> 诊毕</button>
+	</div>
+	<form class="form form-horizontal" id="form-article-add">
+		<div id="tab-system" class="HuiTab">
+			<div class="tabBar cl">
+				<span>病历首页</span>
+				<span>检查申请</span>
+				<span>检验申请</span>
+				<span>门诊确诊</span>
+				<span>处置申请</span>
+				<span>成药处方</span>
+				<span>草药处方</span>
+				<span>费用查询</span>
+			</div>
+			<div class="tabCon">		
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1 btn-link">病历内容：</label>
+				</div>	
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">主诉：</label>
+					<div class="formControls col-xs-4 col-sm-9" >
+						<textarea class="textarea" @click="check" v-model="medicalrecord.readme"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">现病史：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea" v-model="medicalrecord.present"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">现病治疗情况：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea" v-model="medicalrecord.presentTreat"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">既往史：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea" v-model="medicalrecord.history" ></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">过敏史：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea" v-model="medicalrecord.allergy" ></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">体格检查：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea"  v-model="medicalrecord.physique"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1 btn-link">评估/诊断：</label>
+				</div>	
+				<label class="form-label col-xs-1 col-sm-1 ">西医诊断：</label>
+				<label class="form-label col-xs-1 col-sm-1 btn-link" @click="fresh" style="margin-left: 700px;">刷新</label>
+				<label class="form-label col-xs-1 col-sm-1 btn-link" onClick="article_edit('添加西药诊断','medicaldisease-add.html','1200px','600px')" >添加</label>
+				<table class="table table-border table-bordered table-bg table-hover table-sort table-responsive" style="width: 1000px;margin-left:50px;">
+					<thead>
+						<tr class="text-c">
+							<th width="80">ICD编码</th>
+							<th width="80">名称</th>
+							<th width="120">发病时间</th>
+							<th width="120">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="text-c">
+							<td v-text="medicalDisease.diseaseID.diseaseICD"></td>
+							<td v-text="medicalDisease.diseaseID.diseaseName"></td>
+							<td v-text="medicalDisease.getSiskDate"></td>
+							<td><button v-if="medicalDisease.diseaseID.diseaseICD!=null" @click="deleteDisease" name="" id="" class="btn btn-success" type="button">删除</button></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">检查建议：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea"  v-model="medicalrecord.proposal"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">注意事项：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea" v-model="medicalrecord.careful" ></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">检查结果：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea"  v-model="medicalrecord.checkResult"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">诊断结果：</label>
+					<div class="formControls col-xs-4 col-sm-9">
+						<textarea class="textarea"   v-model="medicalrecord.diagnosis"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<label class="form-label col-xs-1 col-sm-1">处理意见：</label>
+					<div class="formControls col-xs-1 col-sm-9">
+						<textarea class="textarea"   v-model="medicalrecord.handling"></textarea>
+					</div>
+				</div>
+				<div class="row cl">
+					<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+						<button  class="btn btn-primary radius" type="button" @click="save"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+						<button  class="btn btn-default radius" type="reset" style="margin-left: 50px;">&nbsp;&nbsp;清空&nbsp;&nbsp;</button>
+					</div>
+				</div>
+			</div>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">检查申请：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<textarea class="textarea" name="" id=""></textarea>
+					</div>
+				</div>				
+			</div>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">检验申请：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text"  class="input-text" value="" id="" name="">
+					</div>
+				</div>				
+			</div>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">门诊确诊：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text"  class="input-text" value="" id="" name="">
+					</div>
+				</div>				
+			</div>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">处置申请：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text"  class="input-text" value="" id="" name="">
+					</div>
+				</div>				
+			</div>
+			<div class="tabCon">
+				<table class="table">
+					<tr>
+						<td width="300" class="va-t">
+							<div style="margin-top: 10px;">
+								<label style="font-size: 14px;"><strong>门诊诊断：[西医诊断] {{medicalDisease.diseaseID.diseaseName}}</strong></label>
+							</div>
+							<div style="height: 300px; border: 1px solid whitesmoke;">
+							<table class="table table-border table-bg table-hover table-responsive table1" >
+								<thead>
+									<tr class="text-c">
+										<th width="25"></th>
+										<th width="80">名称</th>
+										<th width="80">状态</th>
+									</tr>                  
+								</thead>
+								<tbody>
+									<tr class="text-c" v-for="item in prescriptionList" @click="chooseCase(item)">
+										<td><input type="checkbox" v-model="item.chooseState" @change="deleteadd(item)" value="" name=""></td>
+										<td v-text="item.prescriptionName"></td>
+										<td v-if="item.prescriptionState==1"  >暂存</td>
+										<td v-if="item.prescriptionState==2">已开立</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+							<div style="margin-top: 10px;">
+								<label style="font-size: 14px;"><strong>处方模板：</strong></label>
+							</div>
+							<div style="margin-top: 10px; margin-bottom: 10px;">
+								<label style="font-size: 14px;"><strong>名称：</strong></label>
+								<input type="text" name="" id="" v-model="TemplateName" placeholder="输入模板名称"  style="width:175px" class="input-text">
+								<button name="" id="" @click="checkTemplate" class="btn btn-success" type="button"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+							</div>
+							<div  style="height: 300px; border: 1px solid whitesmoke;">
+							<table class="table table-border table-bg table-hover  table-responsive table1" >
+								<thead>
+									<tr class="text-c">
+										<th width="80">模板名称</th>
+										<th width="80">范围</th>
+									</tr>                  
+								</thead>
+								<tbody>
+									<tr class="text-c" v-for="item in drugstemplateList" @click="selectTemplate(item)">										
+										<td v-text="item.name"></td>
+										<td v-if="item.scope==1">全院</td>
+										<td v-if="item.scope==2">科室</td>
+										<td v-if="item.scope==3">个人</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+						</td>
+		<td class="va-t">
+			<div style="margin-bottom: 10px;">
+				<button name="" id="" class="btn btn-primary "  onClick="article_edit('增加处方','case-add.html','600px','200px')" type="button" ><i class="Hui-iconfont">&#xe604;</i>增方</button>
+				<button name="" id="" class="btn btn-primary" @click="deleteCase" type="button" ><i class="Hui-iconfont">&#xe60b;</i>删方</button>
+				<button name="" id="" class="btn btn-primary" @click="open" type="button" ><i class="Hui-iconfont">&#xe615;</i>开立</button>
+				<button name="" id="" class="btn btn-primary" @click="freshAll" type="button" ><i class="Hui-iconfont">&#xe6f7;</i>刷新</button>
+				<button name="" id="" class="btn btn-primary"  type="button" onClick="article_edit('处方增加药品','drug-add.html','1200px','600px')" style="margin-left: 550px;" ><i class="Hui-iconfont">&#xe604;</i>增药</button>
+				<button name="" id="" class="btn btn-primary" @click="deleteDrug" type="button" ><i class="Hui-iconfont">&#xe60b;</i>删药</button>
+			</div>
+			<div style="height: 300px; border: 1px solid whitesmoke;">
+			<table class="table table-border table-bg table-hover table-responsive table1" >
+				<thead>
+					<tr class="text-c">
+						<th width="25"></th>
+						<th width="80">药品名称</th>
+						<th width="80">规格</th>
+						<th width="80">单价</th>
+						<th width="80">用法</th>
+						<th width="80">用量</th>
+						<th width="80">频次</th>
+						<th width="80">数量</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="text-c" v-for="item in drugsList">	
+						<td><input type="checkbox" value="" v-model="item.chooseState" @change="deleteaddDrug(item)" name=""></td>
+						<td v-text="item.drugsID.drugsName"></td>
+						<td v-text="item.drugsID.drugsFormat"></td>
+						<td v-text="item.drugsID.drugsPrice"></td>
+						<td v-text="item.drugsUsage"></td>
+						<td v-text="item.dosage"></td>
+						<td v-text="item.frequency"></td>
+						<td v-text="item.amount"></td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+			<div style="margin-top: 20px;">
+				<label style="font-size: 14px; margin-top: 200px;"><strong>模板明细：</strong></label>
+				<button  class="btn btn-primary radius" @click="chooseTemplate" type="button"style="margin-left: 775px; margin-bottom: 10px;"> <i class="Hui-iconfont">&#xe632;</i> 使用该模板</button>
+			</div>
+			<div style="height: 300px; border: 1px solid whitesmoke;">
+			<table class="table table-border table-bg table-hover table-responsive table1" >
+				<thead>
+					<tr class="text-c">
+						<th width="80">药品名称</th>
+						<th width="80">规格</th>
+						<th width="80">单位</th>
+						<th width="80">用法</th>
+						<th width="80">用量</th>
+						<th width="80">频次</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="text-c" v-for="item in selectdrugList">	
+						<td v-text="item.drugsID.drugsName"></td>
+						<td v-text="item.drugsID.drugsFormat"></td>
+						<td v-text="item.drugsID.drugsUnit"></td>
+						<td v-text="item.drugsUsage"></td>
+						<td v-text="item.dosage"></td>
+						<td v-text="item.frequency"></td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+		</td>	
+			</tr>
+			</table>				
+			</div>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">草药处方：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text"  class="input-text" value="" id="" name="">
+					</div>
+				</div>				
+			</div>
+			<div class="tabCon">
+				<div class="row cl">
+					<label class="form-label col-xs-4 col-sm-2">费用查询：</label>
+					<div class="formControls col-xs-8 col-sm-9">
+						<input type="text"  class="input-text" value="" id="" name="">
+					</div>
+				</div>				
+			</div>
+			<div class="tabCon">
+			</div>
+		</div>
+			
+			
+	
+	</form>
+</div>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="static/h-ui/js/H-ui.min.js"></script>
+<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.js"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript">
+function article_edit(title,url,w,h){
+		layer.open({
+			type: 2,
+			title: title,
+			content: url,
+		    area: [w, h],  //弹出层页面比例
+		});
+}
+$(function(){
+	$('.skin-minimal input').iCheck({
+		checkboxClass: 'icheckbox-blue',
+		radioClass: 'iradio-blue',
+		increaseArea: '20%'
+	});
+	$("#tab-system").Huitab({
+		index:0
+	});
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>
+		var app =new Vue({ 
+			el:"#wrap",
+			data:{
+				userID:{id:1},
+				TemplateName:"",
+				//从localStorage取出相应对象
+				register:{
+					id:0,
+					realName:"空",
+					caseNumber:0,
+					age:0,
+					gender:{
+						constantName:"空"
+					}
+				},
+				medicalrecord:{
+					caseNumber:0,//注意提交修改
+					register:{},//注意提交修改
+					caseState:1
+				},
+				medicalDisease:{
+					diseaseID:{}
+				},
+				drugstemplateList:[],
+				drugstemplate:{},//选定的模板
+				selectdrugList:[], //选定模板的具体药品明细列表
+				prescriptionList:[] ,//使用的处方列表
+				prescription:{
+					medicalID:{},
+					registID:{},
+					userID:{}
+				} ,//选定的处方对象
+				drugsList:[],//处方的详细药品列表
+				drug:{},
+				deleteCaseList:[], //存储的要删除的处方id
+				deleteDrugList:[], //存储的要删除的处方明细id
+			},
+			methods:{
+				check(){
+					if(this.register.id==0){
+						alert("请先选择看诊的病人信息!");
+					}
+				},
+				//刷新新加载的疾病信息
+				fresh(){
+					var medicalDisease = localStorage.getItem("medicalDisease");
+					if(medicalDisease){
+						this.medicalDisease =JSON.parse(medicalDisease);
+					}
+				},
+				deleteDisease(){
+					if(window.confirm("确定要进行删除所选疾病吗？")){
+						this.medicalDisease={diseaseID:{}};
+					}
+				
+				},
+				save(){
+					this.medicalrecord.caseNumber=this.register.caseNumber;
+					this.medicalrecord.registID=this.register;
+					this.medicalDisease.medicalID=this.medicalrecord;
+					this.medicalDisease.registID=this.register;
+					this.medicalDisease.diagnoseType=1;
+					this.medicalDisease.diagnoseCate=1;
+					
+					//存储数据
+					axios.post("http://localhost:8080/visit/save",this.medicalDisease).then(res=>{
+							alert(res.data.msg);
+					});
+					
+				},
+				initTemplate(){
+					var _this=this;
+					//获取处方模板信息
+					axios.post("http://localhost:8080/prescribe/init").then(res=>{
+							_this.drugstemplateList=res.data.drugstemplates;
+					});	
+				},
+				checkTemplate(){
+					if(this.TemplateName==""){
+						this.initTemplate();
+					}else{
+						var _this =this;
+						axios.post("http://localhost:8080/prescribe/check?checkName="+this.TemplateName).then(res=>{
+							_this.drugstemplateList=res.data.drugstemplates;
+						});	
+					}
+					
+				},
+				selectTemplate(item){
+					this.drugstemplate=item;
+					var _this =this;
+					axios.post("http://localhost:8080/prescribe/select?id="+this.drugstemplate.id).then(res=>{
+						_this.selectdrugList=res.data.drugsdetaileds;
+					});	
+				},
+				//选定使用的模板
+				chooseTemplate(){
+					//把使用的模板暂存
+					this.prescription.medicalID=this.medicalrecord;
+					this.prescription.registID=this.register;
+					this.prescription.userID=this.userID;
+					this.prescription.prescriptionName=this.drugstemplate.name;
+					this.prescription.prescriptionState=1;
+					var _this=this;
+					axios.post("http://localhost:8080/prescribe/save1",this.prescription).then(res=>{
+							_this.saveDrugsList(res.data);
+					});	
+				
+				},
+				saveDrugsList(temp){
+					// //把模板中的具体药品暂存
+					this.drugsList=[];
+					for(var i=0;i<this.selectdrugList.length;i++){
+						var prescriptiondetailed ={};
+						this.prescription.id=temp;
+						prescriptiondetailed.prescriptionID=this.prescription;
+						prescriptiondetailed.drugsID=this.selectdrugList[i].drugsID;
+						prescriptiondetailed.drugsUsage=this.selectdrugList[i].drugsUsage;
+						prescriptiondetailed.dosage=this.selectdrugList[i].dosage;
+						prescriptiondetailed.frequency=this.selectdrugList[i].frequency;
+						prescriptiondetailed.amount=1;
+						prescriptiondetailed.state=1;
+						this.drugsList.push(prescriptiondetailed);
+					}	
+					axios.post("http://localhost:8080/prescribe/save2",this.drugsList).then(res=>{
+						alert(res.data.msg);
+					});	
+					this.updatePrescriptionList();
+				},
+				//更新处方列表
+				updatePrescriptionList(){
+					//把使用的模板暂存
+					var _this =this;
+					axios.get("http://localhost:8080/prescribe/updatePreList?id="+this.register.id).then(res=>{
+						_this.prescriptionList=res.data.prescriptions;
+					});	
+				},
+				//更新所选已建处方的药品
+				chooseCase(item){
+					this.prescription=item;
+					var _this =this;
+					axios.get("http://localhost:8080/prescribe/findCase?id="+item.id).then(res=>{
+						_this.drugsList=res.data.prescriptiondetaileds;
+					});	
+					//将选定的处方信息存储在localStorage中
+					localStorage.setItem("case",JSON.stringify(this.prescription));
+				},
+				//刷新处方列表与药品列表
+				freshAll(){
+					this.updatePrescriptionList();
+					this.drugsList=[];
+					this.deleteCaseList=[];
+					this.deleteDrugList=[];
+				},
+				//选择删除的处方
+				deleteadd(item){
+					if(item.chooseState){
+						this.deleteCaseList.push(item.id);
+					}else{
+						var temp = this.deleteCaseList.indexOf(item.id);
+						this.deleteCaseList.splice(temp,1);
+					}
+				},
+				//选择删除的处方明细项目
+				deleteaddDrug(item){
+					if(item.chooseState){
+						this.deleteDrugList.push(item.id);
+					}else{
+						var temp = this.deleteDrugList.indexOf(item.id);
+						this.deleteDrugList.splice(temp,1);
+					}
+				},
+				//删除处方
+				deleteCase(){
+					if(this.deleteCaseList.length==0){
+						alert("请选择要删去的处方");
+					}else{			
+						if(window.confirm("确定要删除所选处方吗？")){
+						//根据处方id删除处方并更新现有处方列表
+						for(var j=0;j<this.deleteCaseList.length;j++){
+							axios.post("http://localhost:8080/prescribe/deleteCase?id="+this.deleteCaseList[j]).then(res=>{		
+							});	
+						}
+						alert("提示：删除处方成功!");
+						}
+					}
+					
+				},
+				deleteDrug(){
+					if(this.deleteDrugList.length==0){
+						alert("请选择要删去的药品");
+					}else{			
+						if(window.confirm("确定要删除所选药品吗？")){
+						//根据处方id删除药品并更新现有列表
+						for(var j=0;j<this.deleteDrugList.length;j++){
+							axios.post("http://localhost:8080/prescribe/deleteDrug?id="+this.deleteDrugList[j]).then(res=>{		
+							});	
+						}
+						alert("提示：删除药品成功!");
+						}
+					}			
+				},
+				//开立处方
+				open(){
+					if(window.confirm("确定要开立所有处方吗？")){
+						axios.get("http://localhost:8080/prescribe/open?id="+this.register.id).then(res=>{
+							alert(res.data.msg);
+						});	
+					}
+				}
+			},
+			created(){
+				var loginID = localStorage.getItem("loginID");
+				if(loginID){
+						  this.userID =JSON.parse(loginID);
+				}else{
+						 alert("您尚未登录，点击确定跳转到登录页面");
+						location.href="login.html";
+				}
+				var register = localStorage.getItem("register");
+				if(register){
+					this.register =JSON.parse(register);
+					var _this = this;
+					if(this.register.visitState==2 || this.register.visitState==3 ){
+						axios.get("http://localhost:8080/visit/findRecord?registID="+this.register.id).then(res=>{
+							_this.medicalDisease=res.data;
+							_this.medicalrecord=res.data.medicalID;
+						});		
+					}
+					this.initTemplate();
+					this.updatePrescriptionList()
+				}
+			}
+			})
+	</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

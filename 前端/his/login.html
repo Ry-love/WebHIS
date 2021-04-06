@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>东软云医院HIS系统登录界面</title>
+	<link rel="stylesheet" href="./css/login.css" type="text/css"/>
+	
+</head>
+ 
+<body>
+	<div id="wrap">
+    <div class="box">
+        <div id="header">
+            <h1>LOGIN</h1>
+        </div>
+        <form >
+            <div class="group">
+                <input class="inputMaterial" type="text" v-model="user.username" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>用户名</label>
+            </div>
+            <div class="group">
+                <input class="inputMaterial" v-model="user.password" type="password" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>密码</label>
+            </div>
+           <button id="buttonlogintoregister" @click="login" type="button" >登录</button>
+        </form>
+        <div id="footer-box"><p class="footer-text">还没有注册？<span class="sign-up">立即注册</span></p></div>
+    </div>
+    </div>
+ 
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+	var app =new Vue({
+			el:"#wrap",
+			data:{
+				user:{},
+				
+			},
+			methods:{
+				login(){
+					axios.post("http://localhost:8080/user/login",this.user).then(res=>{
+						if(res.data.status){
+							alert(res.data.msg+",点击确定进入主页");
+							//将登录用户的信息放入localStorage key value
+							localStorage.setItem("loginID",JSON.stringify(res.data.user));
+							location.href="index.html";
+						}else{
+							alert(res.data.msg);
+						}
+					});	
+				}
+			},
+			created() {
+			
+			}
+			})	
+</script>
+</body>
+</html>
